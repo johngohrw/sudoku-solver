@@ -4,6 +4,11 @@
     <div class="page">
         <h1>Sudoku Generator</h1>
         <div class="sudokuContainer" id="board"></div>
+        <div style="margin-top: 24px;">
+            <div>difficulty (min: 0, max: 10)</div>
+            <input type="number" id="difficultyInput" min="0" max="10" value="6.5" />
+        </div>
+
         <button id="newGameBtn" style="margin-top: 12px;">New game</button>
     </div>
     <style>
@@ -41,7 +46,19 @@
     let game = new SudokuBoard(6.5);
     renderGame(game)
     document.getElementById('newGameBtn').addEventListener('click', (e) => {
-        game.newGame(6.5)
+        let diff = document.getElementById('difficultyInput').value
+        let diffvalue = parseFloat(diff)
+
+        if (diffvalue > 10) {
+            diffvalue = 10
+        }
+        if (diffvalue < 0) {
+            diffvalue = 0
+        }
+        document.getElementById('difficultyInput').value = diffvalue
+        console.log(diffvalue)
+        game.newGame(diffvalue)
+
         renderGame(game)
     })
     function renderGame(game) {
