@@ -1,0 +1,59 @@
+<html>
+
+<body>
+    <div class="page">
+        <h1>Sudoku Generator</h1>
+        <div class="sudokuContainer" id="board"></div>
+        <button id="newGameBtn" style="margin-top: 12px;">New game</button>
+    </div>
+    <style>
+        .sudokuContainer {
+            display: flex;
+            flex-wrap: wrap;
+            border-top: 1px solid black;
+            border-left: 1px solid black;
+            width: 371px;
+            height: 371px;
+        }
+
+        .cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-right: 1px solid black;
+            border-bottom: 1px solid black;
+            width: 40px;
+            height: 40px;
+        }
+
+        .cell-br {
+            border-right: 2px solid black;
+        }
+
+        .cell-bb {
+            border-bottom: 2px solid black;
+        }
+    </style>
+</body>
+
+<script src="index.js"></script>
+<script>
+    let game = new SudokuBoard(6.5);
+    renderGame(game)
+    document.getElementById('newGameBtn').addEventListener('click', (e) => {
+        game.newGame(6.5)
+        renderGame(game)
+    })
+    function renderGame(game) {
+        let boardEl = document.getElementById("board")
+        boardEl.innerHTML = ""
+        game.board.forEach(cell => {
+            let cellEl = document.createElement('div')
+            cellEl.className = `cell${cell.x !== 8 && cell.x % 3 === 2 ? " cell-br" : ""}${cell.y !== 8 && cell.y % 3 === 2 ? " cell-bb" : ""}`
+            cellEl.innerHTML = cell.value === 0 ? " " : cell.value
+            boardEl.append(cellEl)
+        })
+    }
+</script>
+
+</html>
