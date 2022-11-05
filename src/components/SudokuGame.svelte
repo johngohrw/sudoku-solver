@@ -2,6 +2,9 @@
 	import { onMount } from 'svelte';
 	import { SudokuBoard } from '../lib/sudoku';
 
+	// false = keyboard-mode, true = mouse-mode
+	let inputMode = false;
+
 	let difficulty = 6.5;
 	$: if (typeof difficulty !== 'number' || difficulty < 0) {
 		difficulty = 0;
@@ -19,16 +22,30 @@
 		newGame();
 	});
 
-	$: board = game?.board || [];
-
-	// update active cell with active number
-	$: if (activeNumber > 0 && activeCell[0] > -1 && activeCell[1] > -1) {
-		game.board[activeCell[0] * 9 + activeCell[1]].value = activeNumber;
+	// when there's a valid activeNumber and activeCell combination..
+	$: if (activeNumber > 0 && activeCell[0] >= 0 && activeCell[1] >= 0) {
+		// keyboard mode
+		if (!inputMode) {
+			// update the (already-active) cell to the (newly-pressed) number
+			if (activeCell[0] > -1 && activeCell[1] > -1) {
+				game.board[activeCell[0] * 9 + activeCell[1]].value = activeNumber;
+				activeNumber = -1; // reset the activeNumber
+			}
+		}
+		// mouse mode
+		else {
+			// update the (newly-pressed) cell to the (already-active) number
+			if (activeNumber > 0) {
+				game.board[activeCell[0] * 9 + activeCell[1]].value = activeNumber;
+				activeCell = [-1, -1]; // reset the active cell
+			}
+		}
 	}
-
 	function cellClick(i, j) {
+		// if the clicked cell is already the active cell, deactivate it
 		if (activeCell[0] === i && activeCell[1] === j) {
 			activeCell = [-1, -1];
+			// if the cell clicked wasn't active, activate it
 		} else {
 			activeCell = [i, j];
 		}
@@ -62,6 +79,11 @@
 		<input type="number" max="10" min="0" bind:value={difficulty} />
 		<button on:click={newGame}>New game</button>
 	</div>
+	<div>
+		Input mode:
+		<input type="checkbox" bind:checked={inputMode} />
+		{inputMode ? 'Mouse mode' : 'Keyboard mode'}
+	</div>
 </div>
 <div class="board">
 	{#each Array(9) as _, i}
@@ -75,7 +97,7 @@
 							{activeCell[0] === i && activeCell[1] === j ? 'cell-active' : ''}
 						"
 				>
-					<span class="value">{board[i * 9 + j]?.value || ''}</span>
+					<span class="value">{game?.board[i * 9 + j]?.value || ''}</span>
 				</button>
 			{/each}
 		</div>
