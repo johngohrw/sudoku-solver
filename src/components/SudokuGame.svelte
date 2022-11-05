@@ -1,11 +1,11 @@
 <script>
 	import { onMount } from 'svelte';
-	import { debug } from 'svelte/internal';
 	import { SudokuBoard } from '../lib/sudoku';
 
 	// false = keyboard-mode, true = mouse-mode
 	let inputMode = false;
 	let debugMode = true; // @todo: switch this off after development is done
+	let highlight = false;
 
 	let newDifficulty = 6.5;
 	$: if (typeof newDifficulty !== 'number' || newDifficulty < 0) {
@@ -17,6 +17,18 @@
 
 	let currentDifficulty = newDifficulty;
 	let game;
+
+	// keeps track of the remaining count for each number
+	$: numberCount = game?.board?.reduce(
+		(acc, currentCell) => {
+			if (currentCell.value > 0) {
+				acc[currentCell.value - 1] -= 1;
+			}
+			return acc;
+		},
+		[9, 9, 9, 9, 9, 9, 9, 9, 9]
+	) || [0, 0, 0, 0, 0, 0, 0, 0, 0];
+	$: console.log(numberCount);
 
 	let activeCell = [-1, -1];
 	let activeNumber = -1;
@@ -68,6 +80,8 @@
 			debugMode = !debugMode;
 		} else if ('iI'.includes(event.key)) {
 			inputMode = !inputMode;
+		} else if ('hH'.includes(event.key)) {
+			highlight = !highlight;
 		}
 	}
 
@@ -122,14 +136,28 @@
 
 	<div class="infoPanel">
 		<div class="numbers">
-			{#each [1, 2, 3, 4, 5, 6, 7, 8, 9] as num}
-				<div class="numberButton {activeNumber === num && 'active'}">{num}</div>
+			{#each [1, 2, 3, 4, 5, 6, 7, 8, 9] as num, i}
+				<div class="numberWrapper">
+					<div class="numberButton {activeNumber === num && 'active'}">{num}</div>
+					<div
+						class="remainCount 
+							{numberCount[i] === 0 && 'solved'}
+							{numberCount[i] < 0 && 'sumtingwong'}
+						"
+					>
+						{numberCount[i]}
+					</div>
+				</div>
 			{/each}
 		</div>
 		<div class="stats">
 			<div class="field">
 				<div class="fieldName">Difficulty</div>
 				<div class="fieldValue">{currentDifficulty}</div>
+			</div>
+			<div class="field">
+				<div class="fieldName">Highlight</div>
+				<div class="fieldValue">{highlight ? 'On' : 'Off'}</div>
 			</div>
 			<div class="field">
 				<div class="fieldName">Input mode</div>
@@ -142,7 +170,7 @@
 <style lang="scss">
 	.container {
 		width: 100%;
-		max-width: 560px;
+		max-width: 460px;
 
 		* {
 			box-sizing: border-box;
@@ -158,7 +186,7 @@
 		display: flex;
 		flex-direction: column;
 		width: 100%;
-		margin-bottom: 1rem;
+		margin-bottom: 2rem;
 	}
 
 	.row {
@@ -198,24 +226,52 @@
 		width: 100%;
 		display: flex;
 		flex-direction: column;
-		margin-bottom: 1rem;
+		margin-bottom: 2rem;
 
 		.numbers {
 			display: flex;
 			justify-content: space-around;
-			margin-bottom: 1rem;
+			flex-wrap: wrap;
+			margin-bottom: 2rem;
+
+			.numberWrapper {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+
+				margin-bottom: 0.8rem;
+
+				&:not(:last-child) {
+					margin-right: 0.6rem;
+				}
+			}
 
 			.numberButton {
 				display: flex;
 				justify-content: center;
 				align-items: center;
-				width: 36px;
+				width: 2.3rem;
 				aspect-ratio: 1;
-				border: 1px solid black;
+				font-size: 1rem;
+				background-color: #4f4f4f;
+				color: white;
 				border-radius: 50%;
 
 				&.active {
-					background-color: aqua;
+					background-color: #0e9f99;
+				}
+			}
+
+			.remainCount {
+				font-size: 0.7rem;
+				margin-top: 0.15rem;
+
+				&.solved {
+					color: green;
+				}
+
+				&.sumtingwong {
+					color: red;
 				}
 			}
 		}

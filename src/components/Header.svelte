@@ -20,8 +20,8 @@
 		background: rgb(2, 0, 36);
 		background: linear-gradient(
 			90deg,
-			rgba(0, 0, 0, 1) 0%,
-			rgba(0, 0, 0, 0) clamp(500px, 80%, 1200px)
+			rgba(25, 25, 25, 1) 0%,
+			rgba(0, 0, 0, 0) clamp(400px, 75%, 1000px)
 		);
 	}
 	ul {
