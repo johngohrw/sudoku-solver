@@ -4,7 +4,12 @@
 
 	// false = keyboard-mode, true = mouse-mode
 	let inputMode = false;
-	let debugMode = true; // @todo: switch this off after development is done
+	$: if (inputMode) {
+		// in mousemode, clear activeCell
+		activeCell = [-1, -1];
+	}
+
+	let debugMode = false;
 	let highlight = false;
 
 	let newDifficulty = 6.5;
@@ -28,7 +33,6 @@
 		},
 		[9, 9, 9, 9, 9, 9, 9, 9, 9]
 	) || [0, 0, 0, 0, 0, 0, 0, 0, 0];
-	$: console.log(numberCount);
 
 	let activeCell = [-1, -1];
 	let activeNumber = -1;
@@ -39,6 +43,8 @@
 
 	// when there's a valid activeNumber and activeCell combination..
 	$: if (activeNumber > 0 && activeCell[0] >= 0 && activeCell[1] >= 0) {
+		const cellValue = game.board[activeCell[0] * 9 + activeCell[1]].value;
+
 		// keyboard mode
 		if (!inputMode) {
 			// update the (already-active) cell to the (newly-pressed) number
@@ -49,8 +55,13 @@
 		}
 		// mouse mode
 		else {
+			// if the cell already has the same number, delete it
+			if (activeNumber === cellValue) {
+				game.board[activeCell[0] * 9 + activeCell[1]].value = 0;
+				activeCell = [-1, -1]; // reset the active cell
+			}
 			// update the (newly-pressed) cell to the (already-active) number
-			if (activeNumber > 0) {
+			else if (activeNumber > 0) {
 				game.board[activeCell[0] * 9 + activeCell[1]].value = activeNumber;
 				activeCell = [-1, -1]; // reset the active cell
 			}
@@ -60,7 +71,6 @@
 		// if the clicked cell is already the active cell, deactivate it
 		if (activeCell[0] === i && activeCell[1] === j) {
 			activeCell = [-1, -1];
-			// if the cell clicked wasn't active, activate it
 		} else {
 			activeCell = [i, j];
 		}
@@ -75,7 +85,13 @@
 				activeNumber = parseInt(event.key);
 			}
 		} else if (event.key === 'Escape') {
-			activeNumber = -1;
+			if (!inputMode) {
+				// keyboard mode
+				game.board[activeCell[0] * 9 + activeCell[1]].value = 0;
+			} else {
+				//mouse mode
+				activeNumber = -1;
+			}
 		} else if ('dD'.includes(event.key)) {
 			debugMode = !debugMode;
 		} else if ('iI'.includes(event.key)) {
@@ -138,7 +154,7 @@
 		<div class="numbers">
 			{#each [1, 2, 3, 4, 5, 6, 7, 8, 9] as num, i}
 				<div class="numberWrapper">
-					<div class="numberButton {activeNumber === num && 'active'}">{num}</div>
+					<button class="numberButton {activeNumber === num && 'active'}">{num}</button>
 					<div
 						class="remainCount 
 							{numberCount[i] === 0 && 'solved'}
@@ -242,7 +258,7 @@
 				margin-bottom: 0.8rem;
 
 				&:not(:last-child) {
-					margin-right: 0.6rem;
+					margin-right: 0.2rem;
 				}
 			}
 
@@ -250,12 +266,16 @@
 				display: flex;
 				justify-content: center;
 				align-items: center;
-				width: 2.3rem;
-				aspect-ratio: 1;
+				width: 2rem;
+				height: 2rem;
 				font-size: 1rem;
-				background-color: #4f4f4f;
+				background-color: #838383;
 				color: white;
 				border-radius: 50%;
+				border: none;
+				user-select: none;
+				cursor: pointer;
+				box-sizing: content-box;
 
 				&.active {
 					background-color: #0e9f99;
