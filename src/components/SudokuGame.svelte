@@ -101,6 +101,15 @@
 		}
 	}
 
+	// works only for mouse mode
+	function numberButtonClick(number) {
+		if (activeNumber > 0 && activeNumber === number) {
+			activeNumber = -1;
+		} else {
+			activeNumber = number;
+		}
+	}
+
 	function newGame() {
 		currentDifficulty = newDifficulty;
 		game = new SudokuBoard(currentDifficulty);
@@ -154,7 +163,10 @@
 		<div class="numbers">
 			{#each [1, 2, 3, 4, 5, 6, 7, 8, 9] as num, i}
 				<div class="numberWrapper">
-					<button class="numberButton {activeNumber === num && 'active'}">{num}</button>
+					<button
+						on:click={() => numberButtonClick(num)}
+						class="numberButton {activeNumber === num && 'active'}">{num}</button
+					>
 					<div
 						class="remainCount 
 							{numberCount[i] === 0 && 'solved'}
@@ -266,8 +278,9 @@
 				display: flex;
 				justify-content: center;
 				align-items: center;
-				width: 2rem;
-				height: 2rem;
+				padding: 0;
+				width: 2.4rem;
+				height: 2.4rem;
 				font-size: 1rem;
 				background-color: #838383;
 				color: white;
@@ -275,7 +288,6 @@
 				border: none;
 				user-select: none;
 				cursor: pointer;
-				box-sizing: content-box;
 
 				&.active {
 					background-color: #0e9f99;
