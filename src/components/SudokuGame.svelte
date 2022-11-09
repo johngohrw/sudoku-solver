@@ -12,6 +12,9 @@
 	// shows debug panel if true
 	let debugMode = false;
 
+	// marking mode
+	let markMode = false;
+
 	// highlight active number(in mouse/keyboard mode)
 	// and active cell's number(only in keyboard mode)
 	let highlight = true;
@@ -53,6 +56,9 @@
 			previousBoards = previousBoards.slice(0, -1);
 		}
 	};
+
+	// cosmetic purposes
+	let isUndoPressed = false;
 
 	// keeps track of the remaining count for each number
 	$: numberCount = game?.board?.reduce(
@@ -136,7 +142,17 @@
 		} else if ('hH'.includes(event.key)) {
 			highlight = !highlight;
 		} else if ('zZ'.includes(event.key)) {
+			isUndoPressed = true;
 			restorePreviousBoard();
+		} else if (' Mm'.includes(event.key)) {
+			markMode = !markMode;
+		}
+	}
+
+	function keyup(event) {
+		if (event.metaKey) return;
+		if ('zZ'.includes(event.key)) {
+			isUndoPressed = false;
 		}
 	}
 
@@ -155,7 +171,7 @@
 	}
 </script>
 
-<svelte:window on:keydown={keydown} />
+<svelte:window on:keydown={keydown} on:keyup={keyup} />
 
 <div class="container">
 	{#if debugMode}
@@ -229,6 +245,33 @@
 					</div>
 				</div>
 			{/each}
+		</div>
+		<div class="tools">
+			<button
+				on:click={restorePreviousBoard}
+				on:mousedown={() => {
+					isUndoPressed = true;
+				}}
+				on:mouseup={() => {
+					isUndoPressed = false;
+				}}
+				class="buttonField"
+			>
+				<div class="keyButton {isUndoPressed && 'active'}">Z</div>
+				<div class="fieldName">Undo</div>
+			</button>
+			<button
+				on:click={() => {
+					markMode = !markMode;
+				}}
+				class="toggleField"
+			>
+				<div class="keyButton {markMode && 'active'}">M</div>
+				<div class="innerFlex">
+					<div class="fieldName">Mark</div>
+					<div class="fieldValue">{markMode ? 'On' : 'Off'}</div>
+				</div>
+			</button>
 		</div>
 		<div class="stats">
 			<div class="field">
@@ -340,7 +383,7 @@
 			display: flex;
 			justify-content: space-around;
 			flex-wrap: wrap;
-			margin-bottom: 1rem;
+			margin-bottom: 0.5rem;
 
 			.numberWrapper {
 				display: flex;
@@ -388,9 +431,14 @@
 			}
 		}
 
+		.tools {
+			display: flex;
+			margin-bottom: 0.5rem;
+		}
+
 		.stats {
 			display: flex;
-			margin-bottom: 1rem;
+			margin-bottom: 5rem;
 		}
 	}
 
@@ -408,7 +456,8 @@
 		}
 	}
 
-	.toggleField {
+	.toggleField,
+	.buttonField {
 		display: flex;
 		flex-direction: row;
 		align-items: center;
@@ -443,8 +492,9 @@
 			border-bottom: 3px solid #a8a8a8;
 			border-right: 3px solid #a8a8a8;
 			border-radius: 8px;
-			width: 2.1rem;
+			min-width: 2.1rem;
 			height: 2.1rem;
+			padding: 0 0.5rem;
 			margin-right: 0.5rem;
 
 			&.active {
@@ -456,13 +506,22 @@
 			}
 		}
 
+		.fieldValue {
+			font-size: 1.2rem;
+			font-weight: 600;
+		}
+	}
+
+	.toggleField {
 		.fieldName {
 			font-size: 0.7rem;
 			margin-bottom: 0.1rem;
 		}
-		.fieldValue {
-			font-size: 1.2rem;
-			font-weight: 600;
+	}
+
+	.buttonField {
+		.fieldName {
+			font-size: 1rem;
 		}
 	}
 </style>
