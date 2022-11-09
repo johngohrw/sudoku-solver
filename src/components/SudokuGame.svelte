@@ -9,10 +9,20 @@
 		activeCell = [-1, -1];
 	}
 
+	// shows debug panel if true
 	let debugMode = false;
-	let highlight = false;
+
+	// highlight active number(in mouse/keyboard mode)
+	// and active cell's number(only in keyboard mode)
+	let highlight = true;
+	let highlightedNumber = -1;
+	$: activeValue = inputMode
+		? activeNumber
+		: game?.board[activeCell[0] * 9 + activeCell[1]]?.value || activeNumber;
+	$: highlightedNumber = highlight ? activeValue : -1;
 
 	let newDifficulty = 6.5;
+	// difficulty constraints: type=number, 0 <= x <= 10
 	$: if (typeof newDifficulty !== 'number' || newDifficulty < 0) {
 		newDifficulty = 0;
 	}
@@ -34,9 +44,11 @@
 		[9, 9, 9, 9, 9, 9, 9, 9, 9]
 	) || [0, 0, 0, 0, 0, 0, 0, 0, 0];
 
+	//  initialize active cell/number ('inactive' values for both)
 	let activeCell = [-1, -1];
 	let activeNumber = -1;
 
+	// start newgame on page load
 	onMount(() => {
 		newGame();
 	});
@@ -51,6 +63,7 @@
 			if (activeCell[0] > -1 && activeCell[1] > -1) {
 				game.board[activeCell[0] * 9 + activeCell[1]].value = activeNumber;
 				activeNumber = -1; // reset the activeNumber
+				activeCell = [-1, -1]; // reset the active cell
 			}
 		}
 		// mouse mode
@@ -121,6 +134,7 @@
 <div class="container">
 	{#if debugMode}
 		<div class="debugPanel">
+			<h2><strong>Debug Panel</strong></h2>
 			<div>Active cell: {activeCell}</div>
 			<div>Active number: {activeNumber}</div>
 			<div>
@@ -137,6 +151,10 @@
 				<input type="checkbox" bind:checked={inputMode} />
 				{inputMode ? 'Mouse mode' : 'Keyboard mode'}
 			</div>
+			<div>
+				Active Value (for highlight):
+				{activeValue}
+			</div>
 		</div>
 	{/if}
 
@@ -152,7 +170,13 @@
 							{activeCell[0] === i && activeCell[1] === j ? 'cell-active' : ''}
 						"
 					>
-						<span class="value">{game?.board[i * 9 + j]?.value || ''}</span>
+						<span
+							class="value 
+								{game?.board[i * 9 + j]?.value === highlightedNumber && 'highlighted'}
+								"
+						>
+							{game?.board[i * 9 + j]?.value || ''}
+						</span>
 					</button>
 				{/each}
 			</div>
@@ -183,14 +207,32 @@
 				<div class="fieldName">Difficulty</div>
 				<div class="fieldValue">{currentDifficulty}</div>
 			</div>
-			<div class="field">
-				<div class="fieldName">Highlight</div>
-				<div class="fieldValue">{highlight ? 'On' : 'Off'}</div>
-			</div>
-			<div class="field">
-				<div class="fieldName">Input mode</div>
-				<div class="fieldValue">{inputMode ? 'Mouse' : 'Keyboard'}</div>
-			</div>
+
+			<button
+				class="toggleField"
+				on:click={() => {
+					highlight = !highlight;
+				}}
+			>
+				<div class="keyButton {highlight && 'active'}">H</div>
+				<div class="innerFlex">
+					<div class="fieldName">Highlight</div>
+					<div class="fieldValue">{highlight ? 'On' : 'Off'}</div>
+				</div>
+			</button>
+
+			<button
+				class="toggleField"
+				on:click={() => {
+					inputMode = !inputMode;
+				}}
+			>
+				<div class="keyButton {inputMode && 'active'}">I</div>
+				<div class="innerFlex">
+					<div class="fieldName">Input mode</div>
+					<div class="fieldValue">{inputMode ? 'Bulk-entry' : 'Normal'}</div>
+				</div>
+			</button>
 		</div>
 	</div>
 </div>
@@ -214,7 +256,7 @@
 		display: flex;
 		flex-direction: column;
 		width: 100%;
-		margin-bottom: 2rem;
+		margin-bottom: 1rem;
 	}
 
 	.row {
@@ -248,6 +290,16 @@
 		left: 50%;
 		transform: translate(-50%, -50%);
 		font-size: 1.2rem;
+
+		&.highlighted {
+			background: #9bd5d2;
+			width: 80%;
+			height: 80%;
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
 	}
 
 	.infoPanel {
@@ -260,7 +312,7 @@
 			display: flex;
 			justify-content: space-around;
 			flex-wrap: wrap;
-			margin-bottom: 2rem;
+			margin-bottom: 1rem;
 
 			.numberWrapper {
 				display: flex;
@@ -315,9 +367,66 @@
 	}
 
 	.field {
+		margin: 0 1rem 0.5rem 0;
+		padding: 0.5rem 0.75rem;
+
+		.fieldName {
+			font-size: 0.7rem;
+			margin-bottom: 0.1rem;
+		}
+		.fieldValue {
+			font-size: 1.2rem;
+			font-weight: 600;
+		}
+	}
+
+	.toggleField {
 		display: flex;
-		flex-direction: column;
-		padding: 0 3rem 1.5rem 0;
+		flex-direction: row;
+		align-items: center;
+		margin: 0 1rem 0.5rem 0;
+		padding: 0.5rem 0.75rem;
+		border-radius: 6px;
+		text-align: unset;
+		border: none;
+		cursor: pointer;
+
+		background-color: rgba(0, 0, 0, 0);
+
+		&:hover {
+			background-color: #e7e7e7;
+		}
+
+		&:active {
+			background-color: #d0d0d0;
+		}
+
+		.innerFlex {
+			display: flex;
+			flex-direction: column;
+		}
+
+		.keyButton {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			background-color: #d5d5d5;
+			border-bottom: 3px solid #a8a8a8;
+			border-right: 3px solid #a8a8a8;
+			border-radius: 8px;
+			width: 2.1rem;
+			height: 2.1rem;
+			margin-right: 0.5rem;
+
+			&.active {
+				background-color: #d5d5d5;
+				border-bottom: 1px solid #bbb;
+				border-right: 1px solid #bbb;
+				border-top: 2px solid #999;
+				border-left: 2px solid #999;
+			}
+		}
 
 		.fieldName {
 			font-size: 0.7rem;
