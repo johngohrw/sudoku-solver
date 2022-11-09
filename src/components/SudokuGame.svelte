@@ -33,6 +33,27 @@
 	let currentDifficulty = newDifficulty;
 	let game;
 
+	// keeps track of previous board states, allowing user to undo
+	let previousBoards = [];
+	// push in the first board state
+	$: if (game?.board && previousBoards?.length <= 0) {
+		saveBoardState();
+	}
+
+	// snapshot function.
+	// please make sure to invoke this before every board state change
+	const saveBoardState = () => {
+		previousBoards = [...previousBoards, JSON.stringify(game.board)];
+	};
+
+	// undo function
+	const restorePreviousBoard = () => {
+		if (previousBoards.length > 0) {
+			game.board = [...JSON.parse(previousBoards[previousBoards.length - 1])];
+			previousBoards = previousBoards.slice(0, -1);
+		}
+	};
+
 	// keeps track of the remaining count for each number
 	$: numberCount = game?.board?.reduce(
 		(acc, currentCell) => {
@@ -55,6 +76,8 @@
 
 	// when there's a valid activeNumber and activeCell combination..
 	$: if (activeNumber > 0 && activeCell[0] >= 0 && activeCell[1] >= 0) {
+		saveBoardState(); // save previous board state to history before changing it
+
 		const cellValue = game.board[activeCell[0] * 9 + activeCell[1]].value;
 
 		// keyboard mode
@@ -80,6 +103,7 @@
 			}
 		}
 	}
+
 	function cellClick(i, j) {
 		// if the clicked cell is already the active cell, deactivate it
 		if (activeCell[0] === i && activeCell[1] === j) {
@@ -111,6 +135,8 @@
 			inputMode = !inputMode;
 		} else if ('hH'.includes(event.key)) {
 			highlight = !highlight;
+		} else if ('zZ'.includes(event.key)) {
+			restorePreviousBoard();
 		}
 	}
 
@@ -158,30 +184,32 @@
 		</div>
 	{/if}
 
-	<div class="board">
-		{#each Array(9) as _, i}
-			<div class="row">
-				{#each Array(9) as _, j}
-					<button
-						on:click={() => cellClick(i, j)}
-						class="cell
+	{#key game?.board}
+		<div class="board">
+			{#each Array(9) as _, i}
+				<div class="row">
+					{#each Array(9) as _, j}
+						<button
+							on:click={() => cellClick(i, j)}
+							class="cell
 							{j !== 8 && j % 3 === 2 ? 'cell-br' : ''}
 							{i !== 8 && i % 3 === 2 ? 'cell-bb' : ''}
 							{activeCell[0] === i && activeCell[1] === j ? 'cell-active' : ''}
 						"
-					>
-						<span
-							class="value 
+						>
+							<span
+								class="value 
 								{game?.board[i * 9 + j]?.value === highlightedNumber && 'highlighted'}
 								"
-						>
-							{game?.board[i * 9 + j]?.value || ''}
-						</span>
-					</button>
-				{/each}
-			</div>
-		{/each}
-	</div>
+							>
+								{game?.board[i * 9 + j]?.value || ''}
+							</span>
+						</button>
+					{/each}
+				</div>
+			{/each}
+		</div>
+	{/key}
 
 	<div class="infoPanel">
 		<div class="numbers">

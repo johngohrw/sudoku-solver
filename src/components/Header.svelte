@@ -6,10 +6,10 @@
 	<nav>
 		<ul>
 			<li aria-current={$page.url.pathname === '/' ? 'page' : undefined}>
-				<a href="/">Sudoku</a>
+				<a href="/">sudoku</a>
 			</li>
 			<li aria-current={$page.url.pathname === '/generator' ? 'page' : undefined}>
-				<a href="/generator">About</a>
+				<a href="/about">about</a>
 			</li>
 		</ul>
 	</nav>
