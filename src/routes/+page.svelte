@@ -3,8 +3,8 @@
 </script>
 
 <svelte:head>
-	<title>Home</title>
-	<meta name="description" content="Svelte demo app" />
+	<title>another sudoku clone</title>
+	<meta name="description" content="another sudoku clone" />
 </svelte:head>
 
 <section>
