@@ -8,7 +8,7 @@
 
 	<p>
 		This is a <a href="https://kit.svelte.dev">SvelteKit</a> app. In fact, it's my first ever project
-		developed using Svelte so save your criticisms for another day since the code structure's horrible.
+		developed using Svelte and the code structure's horrible so save your criticisms for another day.
 	</p>
 
 	<p>

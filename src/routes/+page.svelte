@@ -30,6 +30,7 @@
 				'd')
 			</li>
 			<li>Game timer</li>
+			<li>Solver that you can step through and visualize</li>
 		</ul>
 	</div>
 </section>
