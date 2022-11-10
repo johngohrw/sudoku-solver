@@ -342,18 +342,15 @@
 				<div class="keyButton {isUndoPressed && 'active'}">Z</div>
 				<div class="fieldName">Undo</div>
 			</button>
-			<button
+			<!-- <button
 				on:click={() => {
 					markMode = !markMode;
 				}}
-				class="toggleField"
+				class="buttonField"
 			>
 				<div class="keyButton {markMode && 'active'}">M</div>
-				<div class="innerFlex">
-					<div class="fieldName">Mark</div>
-					<div class="fieldValue">{markMode ? 'On' : 'Off'}</div>
-				</div>
-			</button>
+				<div class="fieldName">Pencil-marking</div>
+			</button> -->
 		</div>
 		<div class="stats">
 			<div class="field">

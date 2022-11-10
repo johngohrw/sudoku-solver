@@ -8,7 +8,7 @@
 </svelte:head>
 
 <section>
-	<h1>sudoku</h1>
+	<h1>another sudoku clone</h1>
 	<SudokuGame />
 
 	<div style="display: block; text-align: unset">
@@ -24,7 +24,12 @@
 
 		<p>More features coming soon:</p>
 		<ul>
-			<li>lol</li>
+			<li>Pencil-marking</li>
+			<li>
+				Difficulty selection (without needing to open up the debug panel, which you can by pressing
+				'd')
+			</li>
+			<li>Game timer</li>
 		</ul>
 	</div>
 </section>
