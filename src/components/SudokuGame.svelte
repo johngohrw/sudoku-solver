@@ -35,6 +35,7 @@
 
 	let currentDifficulty = newDifficulty;
 	let game;
+	let complete = false;
 
 	// keeps track of previous board states, allowing user to undo
 	let previousBoards = [];
@@ -108,6 +109,8 @@
 				activeCell = [-1, -1]; // reset the active cell
 			}
 		}
+
+		checkCompletion();
 	}
 
 	function cellClick(i, j) {
@@ -168,7 +171,75 @@
 	function newGame() {
 		currentDifficulty = newDifficulty;
 		game = new SudokuBoard(currentDifficulty);
+		complete = false;
 	}
+
+	function checkCompletion() {
+		const gamecheck = game.board.reduce(
+			(acc, curr) => {
+				acc.string += curr.value;
+				acc.sum += curr.value;
+				return acc;
+			},
+			{ string: '', sum: 0 }
+		);
+		// console.log('game checksum is ', gamecheck.sum);
+		if (!gamecheck.string.includes('0') & (gamecheck.sum === 405)) {
+			// console.log('initial checksums passed! going through more thorough checking..');
+			const rows = game.board.reduce(
+				(acc, curr) => {
+					acc[curr.y].push(curr.value);
+					return acc;
+				},
+				[[], [], [], [], [], [], [], [], []]
+			);
+			const cols = game.board.reduce(
+				(acc, curr) => {
+					acc[curr.x].push(curr.value);
+					return acc;
+				},
+				[[], [], [], [], [], [], [], [], []]
+			);
+			const sections = game.board.reduce(
+				(acc, curr) => {
+					const section = Math.floor(curr.y / 3) * 3 + Math.floor(curr.x / 3);
+					acc[section].push(curr.value);
+					return acc;
+				},
+				[[], [], [], [], [], [], [], [], []]
+			);
+
+			let completeCheck = true;
+			const allArrays = [...rows, ...cols, ...sections];
+			allArrays.forEach((arr) => {
+				if (!validateSudokuNums(arr)) {
+					completeCheck = false;
+				}
+			});
+			// console.log(complete ? 'complete' : 'not complete');
+			completeCheck = true;
+
+			if (completeCheck) {
+				complete = true;
+			}
+		}
+	}
+
+	// for a number array of length 9, check for occurrence of
+	//  1-9 without any duplicates
+	const validateSudokuNums = (numArr) => {
+		const count = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+		numArr.forEach((num) => {
+			count[num - 1] += 1;
+			if (count[num - 1] === 2) {
+				return false;
+			}
+		});
+		if (count.includes(0)) {
+			return false;
+		}
+		return true;
+	};
 </script>
 
 <svelte:window on:keydown={keydown} on:keyup={keyup} />
@@ -197,6 +268,8 @@
 				Active Value (for highlight):
 				{activeValue}
 			</div>
+			<button on:click={checkCompletion}>manually check completion</button>
+			<div>complete: {complete ? 'yes' : 'no'}</div>
 		</div>
 	{/if}
 
@@ -206,8 +279,13 @@
 				<div class="row">
 					{#each Array(9) as _, j}
 						<button
-							on:click={() => cellClick(i, j)}
+							on:click={() => {
+								if (!complete) {
+									cellClick(i, j);
+								}
+							}}
 							class="cell
+							{complete && 'cell-complete'}
 							{j !== 8 && j % 3 === 2 ? 'cell-br' : ''}
 							{i !== 8 && i % 3 === 2 ? 'cell-bb' : ''}
 							{activeCell[0] === i && activeCell[1] === j ? 'cell-active' : ''}
@@ -248,7 +326,11 @@
 		</div>
 		<div class="tools">
 			<button
-				on:click={restorePreviousBoard}
+				on:click={() => {
+					if (!complete) {
+						restorePreviousBoard();
+					}
+				}}
 				on:mousedown={() => {
 					isUndoPressed = true;
 				}}
@@ -347,6 +429,10 @@
 		background-color: rgba(49, 49, 187, 0.432);
 	}
 
+	.cell-complete {
+		background-color: #c1ffb4;
+	}
+
 	.cell-br {
 		border-right: 2px solid black;
 	}
@@ -405,8 +491,8 @@
 				width: 2.4rem;
 				height: 2.4rem;
 				font-size: 1rem;
-				background-color: #838383;
-				color: white;
+				background-color: #dedede;
+				color: black;
 				border-radius: 50%;
 				border: none;
 				user-select: none;
@@ -414,6 +500,7 @@
 
 				&.active {
 					background-color: #0e9f99;
+					color: white;
 				}
 			}
 
