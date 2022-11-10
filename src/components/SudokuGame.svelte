@@ -270,6 +270,7 @@
 			</div>
 			<button on:click={checkCompletion}>manually check completion</button>
 			<div>complete: {complete ? 'yes' : 'no'}</div>
+			<div>mark mode: <input type="checkbox" bind:checked={markMode} /></div>
 		</div>
 	{/if}
 

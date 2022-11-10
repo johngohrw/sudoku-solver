@@ -25,13 +25,11 @@
 		<h2>More features coming soon:</h2>
 		<ul>
 			<li>Pencil-marking</li>
-			<li>
-				Difficulty selection (without needing to open up the debug panel, which you can by pressing
-				'd')
-			</li>
+			<li>Difficulty selection (without going through the debug panel)</li>
 			<li>Game timer</li>
 			<li>Solver that you can step through and visualize</li>
 		</ul>
+		<p>(you can press 'd' to activate the debug panel)</p>
 	</div>
 </section>
 
