@@ -22,7 +22,7 @@
 			The selected number won't reset after clicking on a cell, allowing multiple consecutive entries.
 		</p>
 
-		<p>More features coming soon:</p>
+		<h2>More features coming soon:</h2>
 		<ul>
 			<li>Pencil-marking</li>
 			<li>
