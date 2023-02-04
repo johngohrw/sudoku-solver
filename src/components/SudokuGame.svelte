@@ -292,11 +292,11 @@
 							{activeCell[0] === i && activeCell[1] === j ? 'cell-active' : ''}
 						"
 						>
-							<span
-								class="value 
-								{game?.board[i * 9 + j]?.value === highlightedNumber && 'highlighted'}
-								"
-							>
+							<div
+								class="highlight {game?.board[i * 9 + j]?.value === highlightedNumber &&
+									'highlighted'}"
+							/>
+							<span class="value">
 								{game?.board[i * 9 + j]?.value || ''}
 							</span>
 						</button>
@@ -441,19 +441,30 @@
 
 	.value {
 		position: absolute;
-		top: 50%;
-		left: 50%;
+		top: calc(50% + 1px);
+		left: calc(50% + 1px);
 		transform: translate(-50%, -50%);
 		font-size: 1.2rem;
+	}
+
+	.highlight {
+		position: absolute;
+		background: #9bd5d2;
+		border-radius: 50%;
+		width: 80%;
+		height: 80%;
+
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		transition-duration: 120ms;
+		opacity: 0;
+		transform: translateY(-50%) scale(0);
 
 		&.highlighted {
-			background: #9bd5d2;
-			width: 80%;
-			height: 80%;
-			border-radius: 50%;
-			display: flex;
-			align-items: center;
-			justify-content: center;
+			opacity: 1;
+			transform: translateY(-50%) scale(1);
 		}
 	}
 

@@ -8,7 +8,7 @@
 </svelte:head>
 
 <section>
-	<h1>another sudoku clone</h1>
+	<h1>Svelte Sudoku</h1>
 	<SudokuGame />
 
 	<div style="display: block; text-align: unset">

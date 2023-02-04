@@ -5,7 +5,7 @@
 		Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 	--font-mono: 'Fira Mono', monospace;
 	--color-bg-0: rgb(202, 216, 228);
-	--color-bg-1: hsl(209, 36%, 86%);
+	--color-bg-1: hsl(207, 35%, 94%);
 	--color-bg-2: hsl(224, 44%, 95%);
 	--color-theme-1: hsl(177, 93%, 44%);
 	--color-theme-2: #f58709;
@@ -22,16 +22,12 @@ body {
 	background-attachment: fixed;
 	background-color: var(--color-bg-1);
 	background-size: 100vw 100vh;
-	background-image: radial-gradient(
-			50% 50% at 50% 50%,
-			rgba(255, 255, 255, 0.75) 0%,
-			rgba(255, 255, 255, 0) 100%
-		),
-		linear-gradient(180deg, var(--color-bg-0) 0%, var(--color-bg-1) 15%, var(--color-bg-2) 50%);
 }
 
 h1,
-h2,
+h2 {
+	font-weight: 600;
+}
 p {
 	font-weight: 400;
 }
